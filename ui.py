@@ -1,9 +1,32 @@
 
+"""Qt UI Layout for Handwrite Simulation.
+
+This module defines the form layout and widget properties for the application
+main window using PySide6. It centralizes UI setup and translations.
+
+Notes
+-----
+- Resource paths for icon and background are relative to the working directory.
+- Docstrings follow NumPy style for clarity and consistency.
+"""
+
 from PySide6 import QtCore, QtGui, QtWidgets
 
 
 class Ui_Form(object):
     def setupUi(self, Form):
+        """Build and configure the main form UI.
+
+        Parameters
+        ----------
+        Form : QtWidgets.QWidget
+            The target widget to initialize and populate with controls.
+
+        Notes
+        -----
+        - Establishes window properties, styles, and child widgets.
+        - Connects accessibility descriptions and layout directions.
+        """
         # 设置窗口对象的名称为"Form"，便于在调试和对象查找时识别。
         Form.setObjectName("Form")
         # 设置窗口为非模态窗口，该窗口打开时，用户仍可以与父窗口或其他窗口交互。
@@ -22,7 +45,7 @@ class Ui_Form(object):
         Form.setMaximumSize(QtCore.QSize(848, 592))
         # 设置窗口图标
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("./ui/3d.ico"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon.addPixmap(QtGui.QPixmap("./assets/ui/3d.ico"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         Form.setWindowIcon(icon)
         # 设置窗口透明度
         Form.setWindowOpacity(0.98)
@@ -161,7 +184,7 @@ class Ui_Form(object):
         # 主界面（除所有按钮、文本框之外的区域）
         self.main_interface = QtWidgets.QListView(Form)
         self.main_interface.setGeometry(QtCore.QRect(-5, -9, 861, 611))
-        self.main_interface.setStyleSheet("background-image: url(./ui/night.png); color: rgb(11, 214, 255);")
+        self.main_interface.setStyleSheet("background-image: url(./assets/ui/night.png); color: rgb(11, 214, 255);")
         self.main_interface.setObjectName("listView")
         
         # 保存按钮
@@ -172,11 +195,11 @@ class Ui_Form(object):
         self.save_button.setObjectName("pushButton_4")
         
         # 载入按钮
-        self.load_utton = QtWidgets.QPushButton(Form)
-        self.load_utton.setGeometry(QtCore.QRect(514, 334, 74, 23))
-        self.load_utton.setStyleSheet("background-color: rgb(221, 255, 235);")
-        self.load_utton.setAutoDefault(False)
-        self.load_utton.setObjectName("pushButton_6")
+        self.load_button = QtWidgets.QPushButton(Form)
+        self.load_button.setGeometry(QtCore.QRect(514, 334, 74, 23))
+        self.load_button.setStyleSheet("background-color: rgb(221, 255, 235);")
+        self.load_button.setAutoDefault(False)
+        self.load_button.setObjectName("pushButton_6")
         
         # R文本框
         self.red = QtWidgets.QLineEdit(Form)
@@ -217,7 +240,7 @@ class Ui_Form(object):
         self.export_button.raise_()
         self.preview_area.raise_()
         self.save_button.raise_()
-        self.load_utton.raise_()
+        self.load_button.raise_()
         self.red.raise_()
         self.green.raise_()
         self.blue.raise_()
@@ -227,6 +250,17 @@ class Ui_Form(object):
 
     # 原本为多语言的国际化支持，这里似乎用于重写？
     def retranslateUi(self, Form):
+        """Apply text translations and placeholder contents.
+
+        Parameters
+        ----------
+        Form : QtWidgets.QWidget
+            The target widget to receive translated labels and placeholders.
+
+        Notes
+        -----
+        Keeps strings centralized for potential i18n and later edits.
+        """
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "手写模拟"))
         self.pending_text.setPlaceholderText(_translate("Form", "本软件主要基于handwrite库开发，仅供学习交流。作者只是一名为手写作业发愁的大学生，想要源码或者想要添加功能、反馈bug的，可以联系作者b站：人走茶凉le"))
@@ -237,7 +271,7 @@ class Ui_Form(object):
         self.preview_button.setText(_translate("Form", "预览"))
         self.export_button.setText(_translate("Form", "导出"))
         self.save_button.setText(_translate("Form", "保存"))
-        self.load_utton.setText(_translate("Form", "载入预设"))
+        self.load_button.setText(_translate("Form", "载入预设"))
         self.red.setText(_translate("Form", "0"))
         self.green.setText(_translate("Form", "0"))
         self.blue.setText(_translate("Form", "0"))

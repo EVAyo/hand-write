@@ -1,3 +1,16 @@
+"""Handwrite Simulation GUI Application.
+
+This module provides a PySide6-based GUI that collects parameters and uses
+the ``handright`` library to generate handwriting-simulated images. Users can
+preview the generated image and export all pages to the ``output`` directory.
+
+Notes
+-----
+- This module follows NumPy-style docstrings for functions and methods.
+- Resource paths (icons, background preview) are referenced by the UI layer.
+
+"""
+
 import sys
 import os
 from PySide6.QtCore import Signal
@@ -10,9 +23,26 @@ from ui import *
 
 
 class mainwindow(QMainWindow, Ui_Form):
+    """Main application window.
+
+    This class wires PySide6 UI widgets to actions that prepare parameters,
+    preview output, save/load presets, and export generated images.
+
+    Attributes
+    ----------
+    sendmsg : Signal
+        Signal emitted after export completes to present a finish message.
+    """
     sendmsg = Signal()
 
     def __init__(self):
+        """Initialize the main window and connect UI signals.
+
+        Notes
+        -----
+        - Buttons connect to file dialogs or action handlers (preview/export).
+        - Preset save/load uses plain text files with one value per line.
+        """
         QMainWindow.__init__(self)
         # Ui_Form.__init__(self)
         self.setupUi(self)
@@ -22,14 +52,30 @@ class mainwindow(QMainWindow, Ui_Form):
         self.preview_button.clicked.connect(self.preview)
         self.export_button.clicked.connect(self.export)
         self.save_button.clicked.connect(self.save)
-        self.load_utton.clicked.connect(self.load)
+        self.load_button.clicked.connect(self.load)
         self.sendmsg.connect(self.msg)
     # 导出完成消息窗
     def msg(self):
+        """Show a completion message after images are exported."""
         QMessageBox.information(self, "完成", "已导出图片到output目录下")
 
     # 保存
     def save(self):
+        """Save current parameters to a preset text file.
+
+        The file format is 18 lines, each line corresponds to a single value
+        in the following order: ``red``, ``green``, ``blue``, ``font``,
+        ``background``, ``word_spacing``, ``word_spacing_sigma``,
+        ``line_spacing``, ``line_spacing_sigma``, ``font_size``,
+        ``font_size_sigma``, ``perturb_x_sigma``, ``perturb_y_sigma``,
+        ``perturb_theta_sigma``, ``top_margin``, ``left_margin``,
+        ``right_margin``, ``bottom_margin``.
+
+        Notes
+        -----
+        Values are persisted as strings; spin box values are stored as ints
+        (except ``perturb_theta_sigma`` stored as float).
+        """
         file_path = savefile()
         if file_path != "":
             file_text = "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" % (
@@ -42,6 +88,13 @@ class mainwindow(QMainWindow, Ui_Form):
                 file.write(file_text)
     # 载入
     def load(self):
+        """Load parameters from a preset text file.
+
+        Notes
+        -----
+        Expects the same 18-line format as produced by :meth:`save`.
+        Populates text fields and spin boxes accordingly.
+        """
         file_path = getfile()
         if file_path != "":
             data = []
@@ -72,6 +125,11 @@ class mainwindow(QMainWindow, Ui_Form):
 
     # 预览
     def preview(self):
+        """Preview the first generated page in the UI preview area.
+
+        Validates minimal required parameters and resource existence, then
+        renders the first image to ``self.preview_area``.
+        """
         if self.font.text() == "" or self.word_spacing.text() == "" or self.bottom_margin.text() == "":
             QMessageBox.information(self, "检查参数", "请检查参数是否完整")
         elif self.pending_text.toPlainText() == "":
@@ -97,6 +155,13 @@ class mainwindow(QMainWindow, Ui_Form):
 
     # 导出
     def export(self):
+        """Export all generated pages as PNG files under ``./output``.
+
+        Notes
+        -----
+        - Ensures ``./output`` exists.
+        - Disables export button during processing to avoid duplicate actions.
+        """
         print(self.get_template())
         if self.font.text() == "" or self.word_spacing.text() == "" or self.bottom_margin.text() == "":
             QMessageBox.information(self, "检查参数", "请检查参数是否完整")
@@ -121,11 +186,24 @@ class mainwindow(QMainWindow, Ui_Form):
 
 
     def check(self):
-        '''检查是否合规'''
+        """检查是否合规（预留）。
+
+        Notes
+        -----
+        该方法用于集中式参数校验，目前留作扩展。
+        """
         pass
 
 
     def get_template(self):
+        """Build a ``handright.Template`` from current UI values.
+
+        Returns
+        -------
+        Template
+            Configured template instance describing margins, spacing, font,
+            perturbation parameters, and background image.
+        """
         template = Template(
             # 背景
             background=Image.open(self.background.text()),
@@ -166,7 +244,13 @@ class mainwindow(QMainWindow, Ui_Form):
     
 
     def run(self):
-        '''运行handright代码'''
+        """运行 handright 生成图像列表。
+
+        Returns
+        -------
+        list of PIL.Image.Image or None
+            Generated images. Returns ``None`` if an exception occurs.
+        """
         try:
             if not os.path.exists("./output"):
                 os.mkdir("./output")
@@ -178,11 +262,25 @@ class mainwindow(QMainWindow, Ui_Form):
 
 
 def getfile():
+    """Open a system file dialog to choose a file.
+
+    Returns
+    -------
+    str
+        Selected file path or empty string if no selection.
+    """
     q = QFileDialog.getOpenFileName()
     return q[0]
 
 
 def savefile():
+    """Open a system file dialog to choose save path.
+
+    Returns
+    -------
+    str
+        Save target file path or empty string if canceled.
+    """
     q = QFileDialog.getSaveFileName()
     return q[0]
 
